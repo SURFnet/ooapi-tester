@@ -1,0 +1,15 @@
+{:paths ["src"]
+ :deps {org.clojure/clojure {:mvn/version "1.11.1"}
+        clj-http/clj-http {:mvn/version "3.12.3"}
+        cheshire/cheshire {:mvn/version "5.11.0"}
+        org.babashka/cli {:mvn/version "0.4.39"}}
+ :aliases {:reveal-nrepl-middleware {:extra-deps {vlaaad/reveal {:mvn/version "RELEASE"}}
+                                     :main-opts  ["-m" "nrepl.cmdline"
+                                                  "--middleware" "[vlaaad.reveal.nrepl/middleware,cider.nrepl/cider-middleware]"]
+                                     :jvm-opts ["-Dvlaaad.reveal.prefs={:theme,:light,:font-size,14}"]}
+           :build {:deps {io.github.seancorfield/build-clj {:git/tag "v0.9.0" :git/sha "d758807"
+                                                            ;; omits deps-deploy dependency:
+                                                            :deps/root "slim"}
+                          clj-bin/clj-bin {:git/url "https://github.com/markus-wa/clj-bin"
+                                           :git/sha "6a26e14a7699b4c92242fe6143a1e94dddac2b78"}}
+                   :ns-default build}}}

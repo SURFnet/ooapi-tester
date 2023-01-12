@@ -1,0 +1,9 @@
+.cpcache
+classes
+.lsp
+.clj-kondo/.cache
+.env
+.envrc
+target/
+.java-version
+.nrepl-port
