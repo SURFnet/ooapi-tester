@@ -2,8 +2,15 @@
   (:require
    [clj-http.client :as http]
    [clojure.pprint :as pprint]
+   [clojure.spec.alpha :as spec]
    [clojure.string :as str]
-   [ooapi-tester.report :as report]))
+   [expound.alpha :as expound]
+   [ooapi-tester.core :as tester]
+   [ooapi-tester.report :as report]
+   [ooapi-tester.specs.course]
+   [ooapi-tester.specs.education-specification]
+   [ooapi-tester.specs.offering]
+   [ooapi-tester.specs.program]))
 
 (set! *warn-on-reflection* true)
 
@@ -30,6 +37,7 @@
     :id-param "educationSpecificationId"
     :depends-on "/education-specifications"
     :rand-id-fn (make-rand-id-fn :educationSpecificationId)
+    :spec :ooapi-tester.specs.education-specification/EducationSpecificationTopLevel
     :doc "An EducationSpecification maps to an OpleidingsEenheid in RIO. Having a path to request a single EducationSpecification is a prerequisite for the RIO mapper to work."}
    {:path "/education-specifications/{educationSpecificationId}/education-specifications"
     :query-params {"consumer" "rio"}
@@ -57,6 +65,7 @@
     :id-param "programId"
     :depends-on "/programs"
     :rand-id-fn (make-rand-id-fn :programId)
+    :spec :ooapi-tester.specs.program/Program
     :doc "A Program maps to an AangebodenOpleiding in RIO. Having a path to request a single Program is a prerequisite for the RIO mapper to work."}
    {:path "/programs/{programId}/offerings"
     :query-params {"consumer" "rio"}
@@ -64,6 +73,7 @@
     :depends-on "/programs"
     :rand-id-fn (make-rand-id-fn :programId)
     :needs-items true
+    :spec :ooapi-tester.specs.offering/OfferingsRequest
     :doc "Offerings map to AangebodenOpleidingCohorten. Having a path to request the Offerings belonging to a Program is a prerequisite for the RIO mapper to work."}
    {:path "/courses"
     :query-params {"consumer" "rio"}
@@ -73,6 +83,7 @@
     :id-param "courseId"
     :depends-on "/courses"
     :rand-id-fn (make-rand-id-fn :courseId)
+    :spec :ooapi-tester.specs.course/Course
     :doc "A Course maps to an AangebodenOpleiding in RIO. Having a path to request a single Program is only necessary if you want to upload course information to RIO."}
    {:path "/courses/{courseId}/offerings"
     :query-params {"consumer" "rio"}
@@ -80,6 +91,7 @@
     :depends-on "/courses"
     :rand-id-fn (make-rand-id-fn :courseId)
     :needs-items true
+    :spec :ooapi-tester.specs.offering/OfferingsRequest
     :doc "Offerings map to AangebodenOpleidingCohorten. Having a path to request the Offerings belonging to a Course is only necessary if you want to upload course information to RIO."}])
 
 (defn get-rand-id
@@ -87,22 +99,34 @@
   (rand-id-fn (get-in @data [source-path :response])))
 
 (defn judge
-  [response-success? needs-items has-items?]
+  [response-success? needs-items has-items? spec spec-result]
   (cond
     (not response-success?)
     [:failure "The request was not successfull."]
 
-    (and response-success? needs-items has-items?)
+    (and response-success? needs-items has-items? spec (true? spec-result))
+    [:success "We could succesfully get a valid response with items."]
+    
+    (and response-success? needs-items has-items? spec (false? spec-result))
+    [:failure "Response is not valid for RIO"]
+
+    (and response-success? needs-items has-items? (not spec))
     [:success "We could succesfully get a valid response with items."]
 
     (and response-success? needs-items (not has-items?))
     [:failure "We were expecting a response with at least one item, but got none."]
 
-    (and response-success? (not needs-items))
-    [:success "We could succesfully get a valid response"]))
+    (and response-success? (not needs-items) (not spec))
+    [:success "We could succesfully get a response"]
+
+    (and response-success? (not needs-items) spec (true? spec-result))
+    [:success "We could succesfully get a valid response"]
+
+    (and response-success? (not needs-items) spec (false? spec-result))
+    [:failure "Response is not valid for RIO"]))
 
 (defn do-request
-  [{:keys [path query-params id-param depends-on needs-items rand-id-fn]}
+  [{:keys [path query-params id-param depends-on spec needs-items rand-id-fn]}
    {:keys [gateway gateway-user gateway-password schachome]}]
   (let [id (when (and id-param depends-on) (get-rand-id depends-on rand-id-fn))
         url (if id
@@ -127,8 +151,9 @@
           response-success? (and (= status 200) (= endpoint-status 200))
           endpoint-response (when response-success?
                               (get-in body [:responses (keyword schachome)]))
+          spec-result (when (and endpoint-response spec) (spec/valid? spec endpoint-response))
           has-items? (boolean (not-empty (:items endpoint-response)))
-          [success-or-failure message] (judge response-success? needs-items has-items?)]
+          [success-or-failure message] (judge response-success? needs-items has-items? spec spec-result)]
 
       (println (str "Gateway response: " status " " reason-phrase))
       (println)
@@ -139,6 +164,11 @@
                             :code endpoint-status
                             :url (get-in body [:gateway :endpoints (keyword schachome) :url])}
 
+                     spec
+                     (assoc
+                      :spec-result spec-result
+                      :spec-message (expound/expound-str spec endpoint-response)) 
+                     
                      endpoint-response
                      (assoc :response endpoint-response))]
         (swap! data assoc path result)
@@ -208,13 +238,17 @@
               (recur (pop queue)))))))
   (store-results opts))
 
-
-
 (comment 
-  (validate-endpoint example-opts)
+  (def opts {:gateway "https://gateway.test.surfeduhub.nl"
+             :gateway-user (System/getenv "SURFEDUHUB_USER")
+             :gateway-password (System/getenv "SURFEDUHUB_PASSWORD")
+             :schachome "dataaccess.test.saxion.nl"})
   
-  
+  (validate-endpoint opts)
+  (store-results opts)
   )
+
+
 
 
 

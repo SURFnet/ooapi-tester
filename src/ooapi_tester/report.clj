@@ -18,7 +18,7 @@
     :skipped "↪️"))
 
 (defn path-report
-  [{:keys [path url status code message response]} {:keys [doc]} opts]
+  [{:keys [path url status code message response spec-message]} {:keys [doc]} opts]
   [:section
    [:h3 path]
    [:i doc]
@@ -30,7 +30,12 @@
    (when response
      [:details
       [:summary "Response"]
-      [:pre [:code {} (json/generate-string response {:pretty true})]]])])
+      [:pre [:code {} (json/generate-string response {:pretty true})]]])
+   
+   (when spec-message
+     [:details
+      [:summary "Validation message"]
+      [:pre [:code {} spec-message]]])])
 
 (defn summary
   [data requests]
