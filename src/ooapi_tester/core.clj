@@ -122,10 +122,8 @@
       (let [result (cond-> {:path path
                             :status success-or-failure
                             :message message
-                            :code endpoint-status}
-
-                     (= endpoint-status 200)
-                     (assoc :url (get-in body [:gateway :endpoints (keyword schachome) :url]))
+                            :code endpoint-status
+                            :url (get-in body [:gateway :endpoints (keyword schachome) :url])}
 
                      endpoint-response
                      (assoc :response endpoint-response))]
@@ -155,7 +153,7 @@
 
 (defn store-results
   [{:keys [schachome]}]
-  (let [results (with-out-str (pprint/print-table [:path :status :url :message] (vals @data)))
+  (let [results (with-out-str (pprint/print-table [:path :status :code :url :message :response] (vals @data)))
         filename (str schachome "-results.txt")]
     (spit filename results)
     (println)
