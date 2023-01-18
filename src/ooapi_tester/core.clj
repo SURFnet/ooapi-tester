@@ -9,7 +9,7 @@
   {:gateway "https://gateway.test.surfeduhub.nl"
    :gateway-user "xxx"
    :gateway-password "xxx"
-   :scachome "xxx"})
+   :schachome "xxx"})
 
 (def data (atom {}))
 
@@ -70,7 +70,7 @@
 
 (defn get-rand-id
   [source-path rand-id-fn]
-  (rand-id-fn (get @data source-path)))
+  (rand-id-fn (get-in @data [source-path :response])))
 
 (defn judge
   [response-success? needs-items has-items?]

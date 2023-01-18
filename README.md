@@ -28,5 +28,5 @@ Response validation is performed by sending the `X-Validate: true` header to the
 ## Building and packaging
 
 1. Run `clj -T:build uberjar` to create an uberjar
-2. Run `clj -T:build pacakge` to package the uberjar as an executable.
+2. Run `clj -T:build package` to package the uberjar as an executable.
 
