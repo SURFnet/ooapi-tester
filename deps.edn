@@ -2,7 +2,8 @@
  :deps {org.clojure/clojure {:mvn/version "1.11.1"}
         clj-http/clj-http {:mvn/version "3.12.3"}
         cheshire/cheshire {:mvn/version "5.11.0"}
-        org.babashka/cli {:mvn/version "0.4.39"}}
+        org.babashka/cli {:mvn/version "0.4.39"}
+        hiccup/hiccup {:mvn/version "1.0.5"}}
  :aliases {:reveal-nrepl-middleware {:extra-deps {vlaaad/reveal {:mvn/version "RELEASE"}}
                                      :main-opts  ["-m" "nrepl.cmdline"
                                                   "--middleware" "[vlaaad.reveal.nrepl/middleware,cider.nrepl/cider-middleware]"]

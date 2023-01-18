@@ -1,7 +1,9 @@
 (ns ooapi-tester.core
-  (:require [clj-http.client :as http]
-            [clojure.pprint :as pprint]
-            [clojure.string :as str]))
+  (:require
+   [clj-http.client :as http]
+   [clojure.pprint :as pprint]
+   [clojure.string :as str]
+   [ooapi-tester.report :as report]))
 
 (set! *warn-on-reflection* true)
 
@@ -18,55 +20,67 @@
   (fn [response] (get (rand-nth (get response :items)) idkw)))
 
 (def requests
-  [{:path "/"}
+  [{:path "/"
+    :doc "The service path is mandatory for all OOAPI endpoints."}
    {:path "/education-specifications"
     :query-params {"consumer" "rio"}
-    :needs-items true}
+    :needs-items true
+    :doc "EducationSpecifications map to OpleidingsEenheden in RIO. Having a path to query all EducationSpecifications meant for RIO is a prerequisite for the migration to RIO."}
    {:path "/education-specifications/{educationSpecificationId}"
     :id-param "educationSpecificationId"
     :depends-on "/education-specifications"
-    :rand-id-fn (make-rand-id-fn :educationSpecificationId)}
+    :rand-id-fn (make-rand-id-fn :educationSpecificationId)
+    :doc "An EducationSpecification maps to an OpleidingsEenheid in RIO. Having a path to request a single EducationSpecification is a prerequisite for the RIO mapper to work."}
    {:path "/education-specifications/{educationSpecificationId}/education-specifications"
     :query-params {"consumer" "rio"}
     :id-param "educationSpecificationId"
     :depends-on "/education-specifications"
-    :rand-id-fn (make-rand-id-fn :educationSpecificationId)}
+    :rand-id-fn (make-rand-id-fn :educationSpecificationId)
+    :doc "This path makes it possible to request nested EducationSpecifications. This allows the RIO mapper to create relations between OpleidingsEenheden in RIO."}
    {:path "/education-specifications/{educationSpecificationId}/programs"
     :query-params {"consumer" "rio"}
     :id-param "educationSpecificationId"
     :depends-on "/education-specifications"
-    :rand-id-fn (make-rand-id-fn :educationSpecificationId)}
+    :rand-id-fn (make-rand-id-fn :educationSpecificationId)
+    :doc "Programs map to AangebodenOpleidingen in RIO. This path isn't strictly required, but good practice to implement."}
    {:path "/education-specifications/{educationSpecificationId}/courses"
     :query-params {"consumer" "rio"}
     :id-param "educationSpecificationId"
     :depends-on "/education-specifications"
-    :rand-id-fn (make-rand-id-fn :educationSpecificationId)}
+    :rand-id-fn (make-rand-id-fn :educationSpecificationId)
+    :doc "Courses map to AangebodenOpleidingen in RIO. This path isn't strictly required, but good practice to implement."}
    {:path "/programs"
     :query-params {"consumer" "rio"}
-    :needs-items true}
+    :needs-items true
+    :doc "Programs map to AangebodenOpleiding in RIO. Having a path to query all Programs meant for RIO is a prerequisite for the migration to RIO."}
    {:path "/programs/{programId}"
     :id-param "programId"
     :depends-on "/programs"
-    :rand-id-fn (make-rand-id-fn :programId)}
+    :rand-id-fn (make-rand-id-fn :programId)
+    :doc "A Program maps to an AangebodenOpleiding in RIO. Having a path to request a single Program is a prerequisite for the RIO mapper to work."}
    {:path "/programs/{programId}/offerings"
     :query-params {"consumer" "rio"}
     :id-param "programId"
     :depends-on "/programs"
     :rand-id-fn (make-rand-id-fn :programId)
-    :needs-items true}
+    :needs-items true
+    :doc "Offerings map to AangebodenOpleidingCohorten. Having a path to request the Offerings belonging to a Program is a prerequisite for the RIO mapper to work."}
    {:path "/courses"
     :query-params {"consumer" "rio"}
-    :needs-items true}
+    :needs-items true
+    :doc "Courses map to AangebodenOpleiding in RIO. Having a path to query all Courses meant for RIO is  is only necessary if you want to upload course information to RIO."}
    {:path "/courses/{courseId}"
     :id-param "courseId"
     :depends-on "/courses"
-    :rand-id-fn (make-rand-id-fn :courseId)}
+    :rand-id-fn (make-rand-id-fn :courseId)
+    :doc "A Course maps to an AangebodenOpleiding in RIO. Having a path to request a single Program is only necessary if you want to upload course information to RIO."}
    {:path "/courses/{courseId}/offerings"
     :query-params {"consumer" "rio"}
     :id-param "courseId"
     :depends-on "/courses"
     :rand-id-fn (make-rand-id-fn :courseId)
-    :needs-items true}])
+    :needs-items true
+    :doc "Offerings map to AangebodenOpleidingCohorten. Having a path to request the Offerings belonging to a Course is only necessary if you want to upload course information to RIO."}])
 
 (defn get-rand-id
   [source-path rand-id-fn]
@@ -152,10 +166,9 @@
   (into (clojure.lang.PersistentQueue/EMPTY) coll))
 
 (defn store-results
-  [{:keys [schachome]}]
-  (let [results (with-out-str (pprint/print-table [:path :status :code :url :message :response] (vals @data)))
-        filename (str schachome "-results.txt")]
-    (spit filename results)
+  [{:keys [schachome] :as opts}]
+  (let [filename (str schachome ".html")]
+    (spit filename (report/report @data requests opts))
     (println)
     (println (str "Test results were written to " filename))))
 
