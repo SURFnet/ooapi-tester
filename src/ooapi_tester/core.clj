@@ -1,6 +1,7 @@
 (ns ooapi-tester.core
   (:require
-   [clj-http.client :as http]
+   [clj-http.lite.client :as http]
+   [clojure.data.json :as json]
    [clojure.pprint :as pprint]
    [clojure.spec.alpha :as spec]
    [clojure.string :as str]
@@ -134,8 +135,7 @@
               (str gateway path))
         req-opts (cond-> {:headers {"X-Route" (str "endpoint=" schachome)
                                     "X-Validate" "true"
-                                    "Accept" "application/json; version=5"}
-                          :as :json
+                                    "Accept" "application/json; version=5"} 
                           :basic-auth [gateway-user gateway-password]}
 
                    query-params
@@ -146,6 +146,7 @@
     (pprint/pprint (assoc req-opts :basic-auth [gateway-user "REDACTED"]))
 
     (let [{:keys [status body reason-phrase]} (http/get url req-opts)
+          body (json/read-str body :key-fn keyword)
           endpoint-status (when (= status 200)
                             (get-in body [:gateway :endpoints (keyword schachome) :responseCode]))
           response-success? (and (= status 200) (= endpoint-status 200))

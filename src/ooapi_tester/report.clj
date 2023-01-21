@@ -1,7 +1,9 @@
 (ns ooapi-tester.report
   (:require 
    [hiccup.page :as page]
-   [cheshire.core :as json]))
+   [clojure.data.json :as json]))
+
+(set! *warn-on-reflection* true)
 
 (defn enrich-status
   [status-kw]
@@ -30,7 +32,7 @@
    (when response
      [:details
       [:summary "Response"]
-      [:pre [:code {} (json/generate-string response {:pretty true})]]])
+      [:pre [:code {} (with-out-str (json/pprint response))]]])
    
    (when spec-message
      [:details

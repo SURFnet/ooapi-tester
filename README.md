@@ -30,3 +30,6 @@ Response validation is performed by sending the `X-Validate: true` header to the
 1. Run `clj -T:build uberjar` to create an uberjar
 2. Run `clj -T:build package` to package the uberjar as an executable.
 
+## Creating a native binary
+1. Make sure the `GRAALVH_HOME` environment variable is set.
+2. Run `./compile`

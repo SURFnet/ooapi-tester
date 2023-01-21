@@ -5,6 +5,8 @@
    [clojure.string :as str])
   (:gen-class))
 
+(set! *warn-on-reflection* true)
+
 (def spec
   {:gateway   {:ref          "<gateway url>"
                :desc         "The SURFeduhub gateway url to use. Should be a valid url without a trailing slash."
