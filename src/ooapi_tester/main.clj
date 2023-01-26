@@ -32,7 +32,7 @@
      "Simple OOAPI Tester\n
       OOAPI tester relies on two required environment variables: SURFEDUHUB_USER and SURFEDUHUB_PASSWORD\n
       Usage:\n"
-     (cli/format-opts {:spec spec :order [:scachome :gateway]}))
+     (cli/format-opts {:spec spec :order [:schachome :gateway]}))
     (System/exit 0))
 
   (when (str/blank? gateway-user)
