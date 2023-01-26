@@ -7,11 +7,11 @@
    [clojure.string :as str]
    [expound.alpha :as expound]
    [ooapi-tester.core :as tester]
-   [ooapi-tester.report :as report]
-   [ooapi-tester.specs.course]
-   [ooapi-tester.specs.education-specification]
-   [ooapi-tester.specs.offering]
-   [ooapi-tester.specs.program]))
+   [ooapi-tester.report :as report] 
+   [nl.surf.eduhub-rio-mapper.ooapi.education-specification]
+   [nl.surf.eduhub-rio-mapper.ooapi.offerings]
+   [nl.surf.eduhub-rio-mapper.ooapi.course]
+   [nl.surf.eduhub-rio-mapper.ooapi.program]))
 
 (set! *warn-on-reflection* true)
 
@@ -38,7 +38,7 @@
     :id-param "educationSpecificationId"
     :depends-on "/education-specifications"
     :rand-id-fn (make-rand-id-fn :educationSpecificationId)
-    :spec :ooapi-tester.specs.education-specification/EducationSpecificationTopLevel
+    :spec :nl.surf.eduhub-rio-mapper.ooapi.education-specification/EducationSpecificationTopLevel
     :doc "An EducationSpecification maps to an OpleidingsEenheid in RIO. Having a path to request a single EducationSpecification is a prerequisite for the RIO mapper to work."}
    {:path "/education-specifications/{educationSpecificationId}/education-specifications"
     :query-params {"consumer" "rio"}
@@ -66,7 +66,7 @@
     :id-param "programId"
     :depends-on "/programs"
     :rand-id-fn (make-rand-id-fn :programId)
-    :spec :ooapi-tester.specs.program/Program
+    :spec :nl.surf.eduhub-rio-mapper.ooapi.program/Program
     :doc "A Program maps to an AangebodenOpleiding in RIO. Having a path to request a single Program is a prerequisite for the RIO mapper to work."}
    {:path "/programs/{programId}/offerings"
     :query-params {"consumer" "rio"}
@@ -74,7 +74,7 @@
     :depends-on "/programs"
     :rand-id-fn (make-rand-id-fn :programId)
     :needs-items true
-    :spec :ooapi-tester.specs.offering/OfferingsRequest
+    :spec :nl.surf.eduhub-rio-mapper.ooapi.offerings/OfferingsRequest
     :doc "Offerings map to AangebodenOpleidingCohorten. Having a path to request the Offerings belonging to a Program is a prerequisite for the RIO mapper to work."}
    {:path "/courses"
     :query-params {"consumer" "rio"}
@@ -84,7 +84,7 @@
     :id-param "courseId"
     :depends-on "/courses"
     :rand-id-fn (make-rand-id-fn :courseId)
-    :spec :ooapi-tester.specs.course/Course
+    :spec :nl.surf.eduhub-rio-mapper.ooapi.course/Course
     :doc "A Course maps to an AangebodenOpleiding in RIO. Having a path to request a single Program is only necessary if you want to upload course information to RIO."}
    {:path "/courses/{courseId}/offerings"
     :query-params {"consumer" "rio"}
@@ -92,7 +92,7 @@
     :depends-on "/courses"
     :rand-id-fn (make-rand-id-fn :courseId)
     :needs-items true
-    :spec :ooapi-tester.specs.offering/OfferingsRequest
+    :spec :nl.surf.eduhub-rio-mapper.ooapi.offerings/OfferingsRequest
     :doc "Offerings map to AangebodenOpleidingCohorten. Having a path to request the Offerings belonging to a Course is only necessary if you want to upload course information to RIO."}])
 
 (defn get-rand-id
@@ -243,7 +243,7 @@
   (def opts {:gateway "https://gateway.test.surfeduhub.nl"
              :gateway-user (System/getenv "SURFEDUHUB_USER")
              :gateway-password (System/getenv "SURFEDUHUB_PASSWORD")
-             :schachome "dataaccess.test.saxion.nl"})
+             :schachome "demo04.test.surfeduhub.nl"})
   
   (validate-endpoint opts)
   (store-results opts)

@@ -1,0 +1,3 @@
+[submodule "eduhub-rio-mapper"]
+	path = eduhub-rio-mapper
+	url = https://github.com/jomco/eduhub-rio-mapper

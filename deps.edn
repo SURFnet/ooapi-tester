@@ -6,9 +6,33 @@
         hiccup/hiccup {:mvn/version "1.0.5"}
         org.clojure/spec.alpha {:mvn/version "0.3.218"}
         expound/expound {:mvn/version "0.9.0"}
-        com.velisco/strgen {:mvn/version "0.2.4"
-                            :exclusions [criterium/criterium
-                                         org.clojure/clojurescript]}
+        nl.surf/eduhub-rio-mapper {:local/root "eduhub-rio-mapper"
+                                   :exclusions [nl.jomco/ring-trace-context
+                                                org.clojure/data.json
+                                                org.clojure/clojure
+                                                #_org.clojure/tools.logging
+                                                org.clojure/tools.cli
+                                                compojure/compojure
+                                                ch.qos.logback.contrib/logback-jackson
+                                                org.apache.santuario/xmlsec
+                                                com.fasterxml.jackson.dataformat/jackson-dataformat-cbor
+                                                ring/ring-defaults
+                                                ring/ring-jetty-adapter
+                                                ring/ring-json
+                                                com.taoensso/carmine
+                                                commons-io/commons-io
+                                                com.fasterxml.jackson.core/jackson-core
+                                                clj-http/clj-http
+                                                nl.jomco/envopts
+                                                nl.jomco/clj-http-status-codes
+                                                org.clojure/data.xml
+                                                cheshire/cheshire
+                                                ch.qos.logback.contrib/logback-json-classic
+                                                org.clojure/tools.reader
+                                                ch.qos.logback/logback-classic
+                                                org.clojure/core.memoize
+                                                ring/ring-core
+                                                org.clojure/core.async]}
         com.github.clj-easy/graal-build-time {:mvn/version "0.1.4"}}
  :aliases {:reveal-nrepl-middleware {:extra-deps {vlaaad/reveal {:mvn/version "RELEASE"}}
                                      :main-opts  ["-m" "nrepl.cmdline"
