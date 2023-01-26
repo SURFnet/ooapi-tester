@@ -1,7 +1,8 @@
 (ns ooapi-tester.report
   (:require 
    [hiccup.page :as page]
-   [clojure.data.json :as json]))
+   [clojure.data.json :as json]
+   [clojure.java.io :as io]))
 
 (set! *warn-on-reflection* true)
 
@@ -58,7 +59,7 @@
                [:meta {:name "viewport", :content "width=device-width, initial-scale=1.0"}]
                [:meta {:http-equiv "X-UA-Compatible", :content "ie=edge"}]
                [:title (str "OOAPI Report - " (:schachome opts))]
-               [:style (slurp "resources/simple.min.css")]]
+               [:style (slurp (io/resource "simple.min.css"))]]
               [:body
                [:header
                 [:h1 "OOAPI Report"]
