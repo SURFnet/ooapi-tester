@@ -2,9 +2,20 @@
   (:require 
    [hiccup.page :as page]
    [clojure.data.json :as json]
-   [clojure.java.io :as io]))
+   [clojure.java.io :as io]
+   [clojure.string :as str]))
 
 (set! *warn-on-reflection* true)
+
+(defn path->id
+  [path]
+  (if (= path "/")
+    "root"
+    (-> path
+        (subs 1)
+        (str/replace "{" "")
+        (str/replace "}" "")
+        (str/replace "/" "-"))))
 
 (defn enrich-status
   [status-kw]
@@ -22,7 +33,7 @@
 
 (defn path-report
   [{:keys [path url status code message response spec-message]} {:keys [doc]} opts]
-  [:section
+  [:section {:id (path->id path)}
    [:h3 path]
    [:i doc]
    [:table
@@ -47,9 +58,10 @@
     [:th "Path"]
     [:th "Status"]]
    (for [request requests]
-     (let [row (get data (:path request))]
+     (let [row (get data (:path request))
+           path (:path row)]
        [:tr
-        [:td (:path row)]
+        [:td [:a {:href (str "#" (path->id path))} path]]
         [:td (simple-status (:status row))]]))])
 
 (defn report
