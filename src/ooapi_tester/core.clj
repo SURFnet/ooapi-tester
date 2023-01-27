@@ -63,13 +63,15 @@
     :needs-items true
     :doc "Programs map to AangebodenOpleiding in RIO. Having a path to query all Programs meant for RIO is a prerequisite for the migration to RIO."}
    {:path "/programs/{programId}"
+    :query-params {"returnTimelineOverrides" "true"}
     :id-param "programId"
     :depends-on "/programs"
     :rand-id-fn (make-rand-id-fn :programId)
     :spec :nl.surf.eduhub-rio-mapper.ooapi.program/Program
     :doc "A Program maps to an AangebodenOpleiding in RIO. Having a path to request a single Program is a prerequisite for the RIO mapper to work."}
    {:path "/programs/{programId}/offerings"
-    :query-params {"consumer" "rio"}
+    :query-params {"consumer" "rio"
+                   "pageSize" 250}
     :id-param "programId"
     :depends-on "/programs"
     :rand-id-fn (make-rand-id-fn :programId)
@@ -87,7 +89,8 @@
     :spec :nl.surf.eduhub-rio-mapper.ooapi.course/Course
     :doc "A Course maps to an AangebodenOpleiding in RIO. Having a path to request a single Program is only necessary if you want to upload course information to RIO."}
    {:path "/courses/{courseId}/offerings"
-    :query-params {"consumer" "rio"}
+    :query-params {"consumer" "rio"
+                   "pageSize" 250}
     :id-param "courseId"
     :depends-on "/courses"
     :rand-id-fn (make-rand-id-fn :courseId)
