@@ -18,8 +18,8 @@
                    :coerce       :string
                    :require true}})
 
-(def gateway-user (System/getenv "SURFEDUHUB_USER"))
-(def gateway-password (System/getenv "SURFEDUHUB_PASSWORD"))
+(def gateway-user (delay (System/getenv "SURFEDUHUB_USER")))
+(def gateway-password (delay (System/getenv "SURFEDUHUB_PASSWORD")))
 
 (defn -main
   [& args]

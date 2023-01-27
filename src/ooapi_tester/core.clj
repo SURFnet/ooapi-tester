@@ -136,14 +136,14 @@
         req-opts (cond-> {:headers {"X-Route" (str "endpoint=" schachome)
                                     "X-Validate" "true"
                                     "Accept" "application/json; version=5"} 
-                          :basic-auth [gateway-user gateway-password]}
+                          :basic-auth [@gateway-user @gateway-password]}
 
                    query-params
                    (assoc :query-params query-params))]
 
     (println "---------------------------------------")
     (println (str "GET " url))
-    (pprint/pprint (assoc req-opts :basic-auth [gateway-user "REDACTED"]))
+    (pprint/pprint (assoc req-opts :basic-auth [@gateway-user "REDACTED"]))
 
     (let [{:keys [status body reason-phrase]} (http/get url req-opts)
           body (json/read-str body :key-fn keyword)
@@ -241,8 +241,8 @@
 
 (comment 
   (def opts {:gateway "https://gateway.test.surfeduhub.nl"
-             :gateway-user (System/getenv "SURFEDUHUB_USER")
-             :gateway-password (System/getenv "SURFEDUHUB_PASSWORD")
+             :gateway-user (delay (System/getenv "SURFEDUHUB_USER"))
+             :gateway-password (delay (System/getenv "SURFEDUHUB_PASSWORD"))
              :schachome "demo04.test.surfeduhub.nl"})
   
   (validate-endpoint opts)
