@@ -1,0 +1,170 @@
+name: Build
+
+on: [push]
+
+jobs:
+
+  build:
+    
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Setup Java 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+
+      - name: Install Clojure Tools
+        uses: DeLaGuardo/setup-clojure@3.2
+        with:
+          cli: 1.11.1.1208
+
+      - name: Cache clojure dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.m2/repository
+            ~/.gitlibs
+            ~/.deps.clj
+          # List all files containing dependencies:
+          key: cljdeps-${{ hashFiles('deps.edn') }}
+          restore-keys: cljdeps-
+
+      - name: Init mapper
+        run: clojure -T:build init-mapper
+
+      - name: Prepare mapper
+        run: clojure -T:build prep-mapper
+
+      - name: Build JAR
+        run: clojure -T:build uberjar
+
+      - name: Upload JAR Artifacts
+        uses: actions/upload-artifact@v2-preview
+        with:
+          name: ooapi-tester-jvm
+          path: target/ooapi-tester*
+
+  native:
+
+    needs: build
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        gu-binary: [gu, gu.cmd]
+        exclude:
+          - os: ubuntu-latest
+            gu-binary: gu.cmd
+          - os: macos-latest
+            gu-binary: gu.cmd
+          - os: windows-latest
+            gu-binary: gu
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Download Artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: ooapi-tester-jvm
+          path: target
+
+      - name: Setup GraalVM
+        uses: DeLaGuardo/setup-graalvm@4.0
+        with:
+          graalvm: '22.3.0'
+          java: java11
+          arch: amd64
+
+      - name: Install Clojure Tools
+        uses: DeLaGuardo/setup-clojure@3.2
+        with:
+          cli: 1.11.1.1208
+
+      - name: Cache clojure dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.m2/repository
+            ~/.gitlibs
+            ~/.deps.clj
+          # List all files containing dependencies:
+          key: cljdeps-${{ hashFiles('deps.edn') }}
+          restore-keys: cljdeps-
+
+      - name: Install native-image Component
+        run: |
+          ${{ matrix.gu-binary }} install native-image
+
+      - name: Install MSVC Toolset (Windows)
+        if: ${{ matrix.os == 'windows-latest' }}
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          vsversion: 2022
+
+      - name: Build Linux
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        shell: bash
+        run: |
+          clojure -T:build native
+          mv target/ooapi-tester target/ooapi-tester-native-linux
+      - name: Build OSX
+        if: ${{ matrix.os == 'macos-latest' }}
+        shell: bash
+        run: |
+          clojure -T:build native
+          mv target/ooapi-tester target/ooapi-tester-native-macos
+      - name: Build Windows
+        if: ${{ matrix.os == 'windows-latest' }}
+        shell: powershell
+        run: |
+          clojure -T:build native
+          mv target/ooapi-tester.exe target/ooapi-tester-native-windows.exe
+      
+      - name: Upload Native Image Artifact
+        uses: actions/upload-artifact@v2-preview
+        with:
+          name: ooapi-tester-all
+          path: target/ooapi-tester*
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/')
+
+    needs: native
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Download Artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: ooapi-tester-all
+          path: target
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            ./target/ooapi-tester-jvm*
+            ./target/ooapi-tester-native*
+            ./target/ooapi-tester.jar
+            LICENSE
+            README.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

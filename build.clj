@@ -3,16 +3,22 @@
             [org.corfield.build :as bb]
             [clojure.pprint :refer [pprint]]
             [clojure.string :as str]
-            [lein2deps.api :as l2d]))
+            [lein2deps.api :as l2d]
+            [babashka.fs :as fs]))
 
 (def mapper-dir "eduhub-rio-mapper")
 (def lib 'nl.surf/ooapi-tester)
 ;; if you want a version of MAJOR.MINOR.COMMITS:
 (def version (format "0.1.%s" (b/git-count-revs nil)))
 
+(defn print-version
+  [opts]
+  (println version))
+
 (defn init-mapper
   [opts]
-  (b/git-process {:git-args ["submodule" "init"]}))
+  (b/git-process {:git-args ["submodule" "init"]})
+  (b/git-process {:git-args ["submodule" "update"]}))
 
 (defn prep-mapper
   [opts]
@@ -35,26 +41,28 @@
 
 (defn native
   [opts]
-  (let [graal-vm-home (System/getenv "GRAALVM_HOME")]
+  (let [graal-vm-home (System/getenv "GRAALVM_HOME")
+        native-image (fs/which "native-image")]
 
     (if graal-vm-home
       (println (str "GRAALVM_HOME: " graal-vm-home))
       (do
         (println "Please set GRAALVM_HOME environment variable")
         (System/exit 1)))
-
-    (b/process {:command-args [(str graal-vm-home "/bin/native-image")
-                               "-jar"
-                               (bb/default-jar-file lib version)
-                               "-H:Name=ooapi-tester"
-                               "-H:+ReportExceptionStackTraces"
-                               "-H:+PrintClassInitialization"
-                               "-H:ResourceConfigurationFiles=./resource-config.json"
-                               "--enable-url-protocols=https"
-                               "--verbose"
-                               "--no-fallback"
-                               "--no-server"
-                               "-J-Xmx3g"]})))
+    
+    (println (b/process {:command-args [(str native-image)
+                                        "-jar"
+                                        (bb/default-jar-file lib version)
+                                        "-H:Path=target"
+                                        "-H:Name=ooapi-tester"
+                                        "-H:+ReportExceptionStackTraces"
+                                        "-H:+PrintClassInitialization"
+                                        "-H:ResourceConfigurationFiles=./resource-config.json"
+                                        "--enable-url-protocols=https"
+                                        "--verbose"
+                                        "--no-fallback"
+                                        "--no-server"
+                                        "-J-Xmx3g"]}))))
 
 
 

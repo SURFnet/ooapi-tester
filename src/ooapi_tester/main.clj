@@ -18,9 +18,6 @@
                    :coerce       :string
                    :require true}})
 
-(def gateway-user (delay (System/getenv "SURFEDUHUB_USER")))
-(def gateway-password (delay (System/getenv "SURFEDUHUB_PASSWORD")))
-
 (defn -main
   [& args]
   (when (empty? args)
@@ -35,14 +32,20 @@
      (cli/format-opts {:spec spec :order [:schachome :gateway]}))
     (System/exit 0))
 
-  (when (str/blank? @gateway-user)
-    (println "Missing required environment variable: SURFEDUHUB_USER")
-    (System/exit 1))
+  
+  (let [gateway-user (System/getenv "SURFEDUHUB_USER")
+        gateway-password (System/getenv "SURFEDUHUB_PASSWORD")]
+    
+    (when (str/blank? gateway-user)
+      (println "Missing required environment variable: SURFEDUHUB_USER")
+      (System/exit 1))
 
-  (when (str/blank? @gateway-password)
-    (println "Missing required environment variable: SURFEDUHUB_PASSWORD")
-    (System/exit 1))
+    (when (str/blank? gateway-password)
+      (println "Missing required environment variable: SURFEDUHUB_PASSWORD")
+      (System/exit 1))
 
-  (let [opts (cli/parse-opts args {:spec spec})]
-    (tester/validate-endpoint (assoc opts :gateway-user gateway-user :gateway-password gateway-password))))
+    (let [opts (assoc (cli/parse-opts args {:spec spec})
+                      :gateway-user gateway-user
+                      :gateway-password gateway-password)]
+      (tester/validate-endpoint opts))))
 
