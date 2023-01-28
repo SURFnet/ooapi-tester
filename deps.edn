@@ -42,5 +42,6 @@
                                                             ;; omits deps-deploy dependency:
                                                             :deps/root "slim"}
                           clj-bin/clj-bin {:git/url "https://github.com/markus-wa/clj-bin"
-                                           :git/sha "6a26e14a7699b4c92242fe6143a1e94dddac2b78"}}
+                                           :git/sha "6a26e14a7699b4c92242fe6143a1e94dddac2b78"}
+                          io.github.borkdude/lein2deps {:git/sha "219013100796bb5c7438c02fdea2a6aea62650c3"}}
                    :ns-default build}}}

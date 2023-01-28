@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-
-cd eduhub-rio-mapper
-bb -Sdeps '{:deps {io.github.borkdude/lein2deps {:git/sha "219013100796bb5c7438c02fdea2a6aea62650c3"}}}' -m lein2deps.api --print --write-file deps.edn
-clj -X:deps prep
-
-# generated deps.edn doesn't have "resources" in the vector of :paths. That fails.
-# move this to build.clj and edit the generated deps.edn? 
-# https://github.com/borkdude/lein2deps/blob/main/API.md

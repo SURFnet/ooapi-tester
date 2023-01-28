@@ -35,11 +35,11 @@
      (cli/format-opts {:spec spec :order [:schachome :gateway]}))
     (System/exit 0))
 
-  (when (str/blank? gateway-user)
+  (when (str/blank? @gateway-user)
     (println "Missing required environment variable: SURFEDUHUB_USER")
     (System/exit 1))
 
-  (when (str/blank? gateway-password)
+  (when (str/blank? @gateway-password)
     (println "Missing required environment variable: SURFEDUHUB_PASSWORD")
     (System/exit 1))
 
