@@ -170,8 +170,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            ./target/ooapi-tester-jvm*
             ./target/ooapi-tester-native*
-            ./target/ooapi-tester.jar
+            ./target/ooapi-tester-*.jar
             LICENSE
             README.md
