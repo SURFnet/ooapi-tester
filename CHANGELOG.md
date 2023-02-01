@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [0.1.21] - 2023-02-01
+
+### Fixed
+- Release the JAR in CI/CD pipeline.
+
 ## [0.1.18] - 2023-02-01
 
 ### Added
