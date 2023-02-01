@@ -1,6 +1,6 @@
 # OOAPI Tester
 
-This is a simple tool to test an OOAPI endpoint using the SURFeduhub gateway. Right now it only tests whether an endpoint is compatible with the [RIO](https://www.rio-onderwijs.nl/) functionality of [SURFeduhub](https://www.surf.nl/surfeduhub). Right now it tests if the following paths work and provide the correct responses:
+This is a simple tool to test an OOAPI endpoint using the SURFeduhub gateway. Right now it only tests whether an endpoint is compatible with the [RIO](https://www.rio-onderwijs.nl/) functionality of [SURFeduhub](https://www.surf.nl/surfeduhub). It tests if the following paths work and provide the correct responses:
 
 | Path                                                                                | Test                                                                                      |
 | ----------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
@@ -17,7 +17,7 @@ This is a simple tool to test an OOAPI endpoint using the SURFeduhub gateway. Ri
 | `/courses/{courseId}?returnTimelineOverrides=true`                                  | Response validation, uses an id from `/courses`                                           |
 | `/courses/{courseId}/offerings`                                                     | Response validation, uses an id from `/courses`, tests if at least one item can be found  |
 
-Response validation is performed using the specs defined in the [RIO Mapper repository](https://github.com/jomco/eduhub-rio-mapper). The OOAPI tester assumes you're endpoint is connected to SURFeduhub and that you have valid access credentials. You should also know your `schachome` (usually the domain name of your endpoint).
+Response validation is performed using the specs defined in the [RIO Mapper repository](https://github.com/jomco/eduhub-rio-mapper). The OOAPI tester assumes your endpoint is connected to SURFeduhub and that you have valid access credentials. You should also know your `schachome` (usually the domain name of your endpoint).
 
 ## Usage
 OOAPI tester is provided in several formats:
