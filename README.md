@@ -2,20 +2,20 @@
 
 This is a simple tool to test an OOAPI endpoint using the SURFeduhub gateway. Right now it tests the following cases:
 
-| Path                                                                            | Test                                                                                      |
-| ------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| `/`                                                                             | Response validation                                                                       |
-| `/educations-specifications`                                                    | Response validation, tests if at least one item can be found                              |
-| `/education-specifications/{educationSpecificationId}`                          | Response validation, uses an id from `/education-specifications`                          |
-| `/education-specifications/{educationSpecificationId}/education-specifications` | Response validation                                                                       |
-| `/education-specifications/{educationSpecificationId}/programs`                 | Response validation                                                                       |
-| `/education-specifications/{educationSpecificationId}/courses`                  | Response validation                                                                       |
-| `/programs`                                                                     | Response validation, tests if at least one item can be found                              |
-| `/programs/{programId}`                                                         | Response validation, uses an id from `/programs`                                          |
-| `/programs/{programId}/offerings`                                               | Response validation, uses an id from `/programs`, tests if at least one item can be found |
-| `/courses`                                                                      | Response validation, tests if at least one item can be found                              |
-| `/courses/{courseId}`                                                           | Response validation, uses an id from `/courses`                                           |
-| `/courses/{courseId}/offerings`                                                 | Response validation, uses an id from `/courses`, tests if at least one item can be found  |
+| Path                                                                                | Test                                                                                      |
+| ----------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `/`                                                                                 | Response validation                                                                       |
+| `/educations-specifications`                                                        | Response validation, tests if at least one item can be found                              |
+| `/education-specifications/{educationSpecificationId}?returnTimelineOverrides=true` | Response validation, uses an id from `/education-specifications`                          |
+| `/education-specifications/{educationSpecificationId}/education-specifications`     | Response validation                                                                       |
+| `/education-specifications/{educationSpecificationId}/programs`                     | Response validation                                                                       |
+| `/education-specifications/{educationSpecificationId}/courses`                      | Response validation                                                                       |
+| `/programs`                                                                         | Response validation, tests if at least one item can be found                              |
+| `/programs/{programId}?returnTimelineOverrides=true`                                | Response validation, uses an id from `/programs`                                          |
+| `/programs/{programId}/offerings`                                                   | Response validation, uses an id from `/programs`, tests if at least one item can be found |
+| `/courses`                                                                          | Response validation, tests if at least one item can be found                              |
+| `/courses/{courseId}?returnTimelineOverrides=true`                                  | Response validation, uses an id from `/courses`                                           |
+| `/courses/{courseId}/offerings`                                                     | Response validation, uses an id from `/courses`, tests if at least one item can be found  |
 
 Response validation is performed by sending the `X-Validate: true` header to the gateway.
 

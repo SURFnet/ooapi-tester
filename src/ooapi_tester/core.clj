@@ -35,6 +35,7 @@
     :needs-items true
     :doc "EducationSpecifications map to OpleidingsEenheden in RIO. Having a path to query all EducationSpecifications meant for RIO is a prerequisite for the migration to RIO."}
    {:path "/education-specifications/{educationSpecificationId}"
+    :query-params {"returnTimelineOverrides" "true"}
     :id-param "educationSpecificationId"
     :depends-on "/education-specifications"
     :rand-id-fn (make-rand-id-fn :educationSpecificationId)
@@ -83,6 +84,7 @@
     :needs-items true
     :doc "Courses map to AangebodenOpleiding in RIO. Having a path to query all Courses meant for RIO is  is only necessary if you want to upload course information to RIO."}
    {:path "/courses/{courseId}"
+    :query-params {"returnTimelineOverrides" "true"}
     :id-param "courseId"
     :depends-on "/courses"
     :rand-id-fn (make-rand-id-fn :courseId)
