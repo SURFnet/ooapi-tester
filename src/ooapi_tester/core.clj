@@ -27,26 +27,34 @@
   [idkw]
   (fn [response] (get (rand-nth (get response :items)) idkw)))
 
+;; Required URL's for RIO mapper
+;; - `GET /education-specifications/{educationSpecificationId}?returnTimelineOverrides=true`
+;; - `GET /programs/{programId}?returnTimelineOverrides=true`
+;; - `GET /programs/{programId}/offerings?pageSize=250&consumer=rio`
+;; - `GET /courses/{courseId}?returnTimelineOverrides=true`
+;; - `GET /courses/{courseId}/offerings?pageSize=250&consumer=rio`
+
 (def requests
   [{:path "/"
     :doc "The service path is mandatory for all OOAPI endpoints."}
    {:path "/education-specifications"
     :query-params {"consumer" "rio"}
     :needs-items true
-    :doc "EducationSpecifications map to OpleidingsEenheden in RIO. Having a path to query all EducationSpecifications meant for RIO is a prerequisite for the migration to RIO."}
+    :doc "EducationSpecifications map to OpleidingsEenheden in RIO."}
    {:path "/education-specifications/{educationSpecificationId}"
     :query-params {"returnTimelineOverrides" "true"}
     :id-param "educationSpecificationId"
     :depends-on "/education-specifications"
     :rand-id-fn (make-rand-id-fn :educationSpecificationId)
     :spec :nl.surf.eduhub-rio-mapper.ooapi.education-specification/EducationSpecificationTopLevel
-    :doc "An EducationSpecification maps to an OpleidingsEenheid in RIO. Having a path to request a single EducationSpecification is a prerequisite for the RIO mapper to work."}
+    :doc "An EducationSpecification maps to an OpleidingsEenheid in RIO. Having a path to request a single EducationSpecification is a prerequisite for the RIO mapper to work."
+    :rio-prerequisite true}
    {:path "/education-specifications/{educationSpecificationId}/education-specifications"
     :query-params {"consumer" "rio"}
     :id-param "educationSpecificationId"
     :depends-on "/education-specifications"
     :rand-id-fn (make-rand-id-fn :educationSpecificationId)
-    :doc "This path makes it possible to request nested EducationSpecifications. This allows the RIO mapper to create relations between OpleidingsEenheden in RIO."}
+    :doc "This path makes it possible to request nested EducationSpecifications. This path isn't strictly required, but good practice to implement."}
    {:path "/education-specifications/{educationSpecificationId}/programs"
     :query-params {"consumer" "rio"}
     :id-param "educationSpecificationId"
@@ -62,14 +70,15 @@
    {:path "/programs"
     :query-params {"consumer" "rio"}
     :needs-items true
-    :doc "Programs map to AangebodenOpleiding in RIO. Having a path to query all Programs meant for RIO is a prerequisite for the migration to RIO."}
+    :doc "Programs map to AangebodenOpleiding in RIO."}
    {:path "/programs/{programId}"
     :query-params {"returnTimelineOverrides" "true"}
     :id-param "programId"
     :depends-on "/programs"
     :rand-id-fn (make-rand-id-fn :programId)
     :spec :nl.surf.eduhub-rio-mapper.ooapi.program/Program
-    :doc "A Program maps to an AangebodenOpleiding in RIO. Having a path to request a single Program is a prerequisite for the RIO mapper to work."}
+    :doc "A Program maps to an AangebodenOpleiding in RIO. Having a path to request a single Program is a prerequisite for the RIO mapper to work."
+    :rio-prerequisite true}
    {:path "/programs/{programId}/offerings"
     :query-params {"consumer" "rio"
                    "pageSize" 250}
@@ -78,18 +87,20 @@
     :rand-id-fn (make-rand-id-fn :programId)
     :needs-items true
     :spec :nl.surf.eduhub-rio-mapper.ooapi.offerings/OfferingsRequest
-    :doc "Offerings map to AangebodenOpleidingCohorten. Having a path to request the Offerings belonging to a Program is a prerequisite for the RIO mapper to work."}
+    :doc "Offerings map to AangebodenOpleidingCohorten. Having a path to request the Offerings belonging to a Program is a prerequisite for the RIO mapper to work."
+    :rio-prerequisite true}
    {:path "/courses"
     :query-params {"consumer" "rio"}
     :needs-items true
-    :doc "Courses map to AangebodenOpleiding in RIO. Having a path to query all Courses meant for RIO is  is only necessary if you want to upload course information to RIO."}
+    :doc "Courses map to AangebodenOpleiding in RIO."}
    {:path "/courses/{courseId}"
     :query-params {"returnTimelineOverrides" "true"}
     :id-param "courseId"
     :depends-on "/courses"
     :rand-id-fn (make-rand-id-fn :courseId)
     :spec :nl.surf.eduhub-rio-mapper.ooapi.course/Course
-    :doc "A Course maps to an AangebodenOpleiding in RIO. Having a path to request a single Program is only necessary if you want to upload course information to RIO."}
+    :doc "A Course maps to an AangebodenOpleiding in RIO. Having a path to request a single Course is only necessary if you want to upload course information to RIO."
+    :rio-prerequisite true}
    {:path "/courses/{courseId}/offerings"
     :query-params {"consumer" "rio"
                    "pageSize" 250}
@@ -98,7 +109,8 @@
     :rand-id-fn (make-rand-id-fn :courseId)
     :needs-items true
     :spec :nl.surf.eduhub-rio-mapper.ooapi.offerings/OfferingsRequest
-    :doc "Offerings map to AangebodenOpleidingCohorten. Having a path to request the Offerings belonging to a Course is only necessary if you want to upload course information to RIO."}])
+    :doc "Offerings map to AangebodenOpleidingCohorten. Having a path to request the Offerings belonging to a Course is only necessary if you want to upload course information to RIO."
+    :rio-prerequisite true}])
 
 (defn get-rand-id
   [source-path rand-id-fn]

@@ -1,5 +1,5 @@
 (ns ooapi-tester.report
-  (:require 
+  (:require
    [hiccup.page :as page]
    [clojure.data.json :as json]
    [clojure.java.io :as io]
@@ -45,7 +45,7 @@
      [:details
       [:summary "Response"]
       [:pre [:code {} (with-out-str (json/pprint response))]]])
-   
+
    (when spec-message
      [:details
       [:summary "Validation message"]
@@ -56,13 +56,30 @@
   [:table
    [:tr
     [:th "Path"]
-    [:th "Status"]]
+    [:th "Status"]
+    [:th "Prerequisite for RIO?"]]
    (for [request requests]
      (let [row (get data (:path request))
-           path (:path row)]
+           path (:path row)
+           rio-prerequisite? (:rio-prerequisite request)]
        [:tr
         [:td [:a {:href (str "#" (path->id path))} path]]
-        [:td (simple-status (:status row))]]))])
+        [:td (simple-status (:status row))]
+        [:td (if rio-prerequisite? "Yes" "No")]]))])
+
+(defn ready-for-rio-summary
+  [data requests]
+  (let [paths-for-rio (->> requests
+                           (filter :rio-prerequisite)
+                           (map :path)
+                           (into #{}))
+        results (->> data
+                     vals
+                     (filter (comp paths-for-rio :path)))
+        success? (every? #(= % :success) (map :status results))]
+    (if success?
+      [:p "✅ Congratulations, all paths necessary for the RIO mapper are working!"]
+      [:p "❌ Unfortunately, not all paths necessary for the RIO mapper are working a 100% as we expected. Please take a look at the detailed results to determine if this is a problem for your specific usecase."])))
 
 (defn report
   [data requests opts]
@@ -79,6 +96,8 @@
                [:main
                 [:section
                  [:h2 "Summary"]
-                 (summary data requests)]
+                 (summary data requests)
+                 [:h2 "Ready for RIO?"]
+                 (ready-for-rio-summary data requests)]
                 (for [request requests]
                   (path-report (get data (:path request)) request opts))]]))

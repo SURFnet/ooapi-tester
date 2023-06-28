@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [0.1.26] - 2023-06-28
+
+### Added
+- Updated the specs the mapper uses to validate
+- Added a summary about "RIO Readiness" to the report
+
 ## [0.1.21] - 2023-02-01
 
 ### Fixed
